@@ -1,0 +1,46 @@
+name: deploy-github-release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Create NuGet package
+        run: dotnet pack --configuration Release --output release
+
+      - name: Add GitHub NuGet repository
+        run: |
+          dotnet nuget add source \
+            --username ${{ github.repository_owner }} \
+            --password ${{ secrets.REPOSITORY_TOKEN }} \
+            --store-password-in-clear-text \
+            --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+      - name: Push NuGet package to GitHub
+        run: dotnet nuget push "release/*.nupkg" --source github  --api-key ${{ secrets.REPOSITORY_TOKEN }}
+
+      - name: Deploy GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          token: ${{ secrets.REPOSITORY_TOKEN }}
+          body_path: CHANGELOG.md
