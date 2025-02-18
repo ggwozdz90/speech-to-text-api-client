@@ -72,14 +72,16 @@ Console.WriteLine(result);
 
 ## Configuration
 
-The library uses the .NET configuration system. You can configure the base address of the Speech-to-Text API, as well as the default source and target languages, in your `appSettings.json` file:
+The library uses the .NET configuration system. You can configure the base address of the Speech-to-Text API, as well as the default source and target languages, and the timeout settings for HTTP clients in your `appsettings.json` file:
 
 ```json
 {
   "SpeechToText": {
     "BaseAddress": "http://localhost:8000",
     "SourceLanguage": "en_US",
-    "TargetLanguage": "pl_PL"
+    "TargetLanguage": "pl_PL",
+    "TranscribeRouteTimeout": 300,
+    "HealthCheckRouteTimeout": 10
   }
 }
 ```
