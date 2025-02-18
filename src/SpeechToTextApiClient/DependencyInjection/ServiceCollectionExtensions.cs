@@ -40,16 +40,26 @@ public static class ServiceCollectionExtensions
     private static void AddDataLayer(this IServiceCollection services, IConfiguration configuration)
     {
         var apiBaseAddress = configuration.GetValue("SpeechToText:BaseAddress", "http://localhost:8000");
+        var transcribeRouteTimeout = configuration.GetValue("SpeechToText:TranscribeRouteTimeout", 300);
+        var healthCheckRouteTimeout = configuration.GetValue("SpeechToText:HealthCheckRouteTimeout", 10);
 
         services.AddTransient<IFileAccessLocalDataSource, FileAccessLocalDataSource>();
 
         services
             .AddRefitClient<ITranscribeRemoteDataSource>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseAddress));
+            .ConfigureHttpClient(c =>
+            {
+                c.BaseAddress = new Uri(apiBaseAddress);
+                c.Timeout = TimeSpan.FromSeconds(transcribeRouteTimeout);
+            });
 
         services
             .AddRefitClient<IHealthCheckRemoteDataSource>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri(apiBaseAddress));
+            .ConfigureHttpClient(c =>
+            {
+                c.BaseAddress = new Uri(apiBaseAddress);
+                c.Timeout = TimeSpan.FromSeconds(healthCheckRouteTimeout);
+            });
 
         services.AddTransient<ISpeechToTextRepository, SpeechToTextRepository>();
     }
