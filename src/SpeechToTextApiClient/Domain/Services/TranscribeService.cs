@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using System.NET.Http;
 using SpeechToTextApiClient.Domain.Exceptions;
 using SpeechToTextApiClient.Domain.Repositories;
 
@@ -17,11 +18,11 @@ internal sealed class TranscribeService(
 {
     public async Task<string> TranscribeAsync(string filePath, string sourceLanguage)
     {
-
+        // TODO: implement logic
     }
 
     public async Task<string> TranscribeAndTranslateAsync(string filePath, string sourceLanguage, string targetLanguage)
     {
-
+        // TODO: implement logic
     }
 }
